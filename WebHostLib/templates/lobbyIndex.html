@@ -1,0 +1,42 @@
+{% extends 'pageWrapper.html' %}
+
+{% block head %}
+    <title>YAML Lobbies</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="styles/lobby.css") }}" />
+{% endblock %}
+
+{% block body %}
+    {% include 'header/oceanIslandHeader.html' %}
+    <div id="lobby-wrapper">
+        <div id="lobby" class="grass-island">
+            <h1>YAML Lobbies</h1>
+            <p>
+                A lobby keeps everyone's YAML files in one place on the server. Create a lobby, send its link to your
+                players, let everyone upload (or remove) their own YAML, then generate the multiworld from the lobby
+                once everybody is ready.
+            </p>
+            <form method="post" action="{{ url_for('lobby_index') }}">
+                <label for="lobby-name">Lobby name (optional):</label>
+                <input id="lobby-name" name="name" maxlength="64">
+                <button type="submit">Create Lobby</button>
+            </form>
+            {% if lobbies %}
+                <h2>Your lobbies</h2>
+                <table>
+                    <thead>
+                        <tr><th>Name</th><th>Last activity (UTC)</th></tr>
+                    </thead>
+                    <tbody>
+                        {% for lobby in lobbies %}
+                            <tr>
+                                <td><a href="{{ url_for('lobby_view', lobby=lobby.id) }}">{{ lobby.name or "Unnamed lobby" }}</a></td>
+                                <td>{{ lobby.last_activity.strftime("%Y-%m-%d %H:%M") }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+    </div>
+    {% include 'islandFooter.html' %}
+{% endblock %}

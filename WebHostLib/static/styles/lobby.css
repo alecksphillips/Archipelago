@@ -1,0 +1,34 @@
+#lobby-wrapper{
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+#lobby{
+    width: 700px;
+    min-height: 240px;
+    text-align: left;
+}
+
+#lobby table, #lobby-yamls{
+    margin: 1rem auto;
+    text-align: left;
+}
+
+#lobby th, #lobby td, #lobby-yamls th, #lobby-yamls td{
+    padding-right: 20px;
+}
+
+#lobby-yamls form{
+    display: inline;
+}
+
+#lobby-yamls button, #generate-game #lobby-yamls button{
+    margin-top: 0;
+}
+
+.lobby-link{
+    width: 100%;
+    box-sizing: border-box;
+}

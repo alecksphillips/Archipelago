@@ -64,6 +64,10 @@ app.config["PONY"] = {
     'create_db': True
 }
 app.config["MAX_ROLL"] = 20
+# maximum number of YAML files stored in a single lobby
+app.config["LOBBY_MAX_YAMLS"] = 50
+# minimum time in days since last activity for a lobby (and its YAMLs) to be deleted. 0 to keep them forever.
+app.config["LOBBY_AUTO_DELETE"] = 0
 app.config["CACHE_TYPE"] = "SimpleCache"
 app.config["HOST_ADDRESS"] = ""
 app.config["ASSET_RIGHTS"] = False

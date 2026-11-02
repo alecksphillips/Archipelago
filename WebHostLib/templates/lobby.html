@@ -1,0 +1,80 @@
+{% extends 'pageWrapper.html' %}
+
+{% block head %}
+    <title>{{ lobby.name or "YAML Lobby" }}</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="styles/generate.css") }}" />
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename="styles/lobby.css") }}" />
+{% endblock %}
+
+{% block body %}
+    {% include 'header/oceanIslandHeader.html' %}
+    <div id="generate-game-wrapper">
+        <div id="generate-game" class="grass-island">
+            <h1>{{ lobby.name or "YAML Lobby" }}</h1>
+            <p>
+                Share this page's link with your players. Everyone with the link can upload YAML files (or a .zip of
+                them) and remove the ones they uploaded{% if is_owner %}; as the creator of this lobby you can remove
+                any of them{% endif %}. Files stay on the server until they are removed.
+                When everybody is ready, anyone can press Generate.
+            </p>
+            <p>
+                <input id="lobby-link" class="lobby-link" readonly value="{{ request.url }}"
+                       onclick="this.select()">
+            </p>
+
+            <h2>Uploaded YAMLs ({{ yamls | length }}/{{ max_yamls }})</h2>
+            <form method="post" enctype="multipart/form-data" action="{{ url_for('lobby_upload', lobby=lobby.id) }}">
+                <input type="file" name="file" multiple accept=".yaml,.yml,.json,.txt,.zip">
+                <button type="submit">Upload</button>
+            </form>
+
+            {% if yamls %}
+                <table id="lobby-yamls">
+                    <thead>
+                        <tr><th>File</th><th>Uploaded (UTC)</th><th>By</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                        {% for y in yamls %}
+                            <tr>
+                                <td>{{ y.filename }}</td>
+                                <td>{{ y.uploaded.strftime("%Y-%m-%d %H:%M") }}</td>
+                                <td>{{ "you" if y.uploader == me else "another player" }}</td>
+                                <td>
+                                    {% if y.uploader == me or is_owner %}
+                                        <form method="post"
+                                              action="{{ url_for('lobby_delete_yaml', lobby=lobby.id, yaml_id=y.id) }}">
+                                            <button type="submit">Remove</button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p>No YAMLs yet.</p>
+            {% endif %}
+
+            <h2>Generate</h2>
+            <p>Note: games are generated using the current release version of Archipelago, currently {{ version }}.</p>
+            <div id="generate-game-form-wrapper">
+                <form id="lobby-generate-form" method="post" action="{{ url_for('lobby_generate', lobby=lobby.id) }}">
+                    {% include 'lobbyGenerateOptions.html' %}
+                    <p>
+                        <input type="checkbox" id="race" name="race" value="1">
+                        <label for="race">Race mode (no spoiler log, game specific protections enabled)</label>
+                    </p>
+                    <button type="submit" {% if not yamls %}disabled{% endif %}>Generate</button>
+                </form>
+            </div>
+
+            {% if is_owner %}
+                <form method="post" action="{{ url_for('lobby_delete', lobby=lobby.id) }}"
+                      onsubmit="return confirm('Delete this lobby and all of its YAMLs?');">
+                    <button type="submit">Delete Lobby</button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+    {% include 'islandFooter.html' %}
+{% endblock %}

@@ -63,3 +63,22 @@ class Generation(db.Entity):
 class GameDataPackage(db.Entity):
     checksum = PrimaryKey(str)
     data = Required(bytes)
+
+
+class Lobby(db.Entity):
+    """A persistent, link-shared collection of player YAMLs, which can be turned into a multiworld."""
+    id = PrimaryKey(UUID, default=uuid4)
+    owner = Required(UUID, index=True)
+    name = Optional(str)
+    creation_time: datetime = Required(datetime, default=lambda: utcnow())
+    last_activity: datetime = Required(datetime, default=lambda: utcnow(), index=True)  # used for auto-deletion
+    yamls = Set('LobbyYaml')
+
+
+class LobbyYaml(db.Entity):
+    id = PrimaryKey(UUID, default=uuid4)
+    lobby = Required(Lobby)
+    uploader = Required(UUID, index=True)
+    filename = Required(str)
+    content = Required(bytes, lazy=True)
+    uploaded: datetime = Required(datetime, default=lambda: utcnow())

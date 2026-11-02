@@ -54,6 +54,13 @@
 # Maximum number of players that are allowed to be rolled on the server. After this limit, one should roll locally and upload the results.
 #MAX_ROLL: 20
 
+# Maximum number of YAML files that can be stored in a single lobby (/lobby).
+#LOBBY_MAX_YAMLS: 50
+
+# Lobbies are kept until deleted by their creator. Set this to the number of days of inactivity after which a lobby
+# and its stored YAMLs are deleted automatically. 0 disables the auto-delete.
+#LOBBY_AUTO_DELETE: 0
+
 # TODO
 #CACHE_TYPE: "simple"
 

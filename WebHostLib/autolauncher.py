@@ -103,6 +103,8 @@ def init_generator(config: dict[str, Any]) -> None:
 def cleanup(config: dict[str, Any]):
     """delete unowned or old user-content"""
     auto_delete: int = config.get("ROOM_AUTO_DELETE", 0)
+    lobby_auto_delete: int = config.get("LOBBY_AUTO_DELETE", 0)
+    lobbies = 0
     with db_session:
         # >>> bool(uuid.UUID(int=0))
         # True
@@ -114,8 +116,13 @@ def cleanup(config: dict[str, Any]):
             seeds += Seed.select(lambda seed: not seed.rooms and seed.creation_time < cutoff).delete(bulk=True)
         slots = Slot.select(lambda slot: not slot.seed).delete(bulk=True)
         # Command gets deleted by ponyorm Cascade Delete, as Room is Required
-    if rooms or seeds or slots:
-        logging.info(f"{rooms} Rooms, {seeds} Seeds and {slots} Slots have been deleted.")
+        if lobby_auto_delete > 0:
+            cutoff = utcnow() - timedelta(days=lobby_auto_delete)
+            for lobby in Lobby.select(lambda lobby: lobby.last_activity < cutoff):
+                lobby.delete()  # not bulk, so the LobbyYamls get deleted by ponyorm Cascade Delete, as Lobby is Required
+                lobbies += 1
+    if rooms or seeds or slots or lobbies:
+        logging.info(f"{rooms} Rooms, {seeds} Seeds, {slots} Slots and {lobbies} Lobbies have been deleted.")
 
 
 def autohost(config: dict):
@@ -232,6 +239,6 @@ class MultiworldInstance():
         self.process = None
 
 
-from .models import Room, Generation, STATE_QUEUED, STATE_STARTED, STATE_ERROR, db, Seed, Slot
+from .models import Room, Generation, STATE_QUEUED, STATE_STARTED, STATE_ERROR, db, Seed, Slot, Lobby
 from .customserver import run_server_process, get_static_server_data
 from .generate import gen_game
