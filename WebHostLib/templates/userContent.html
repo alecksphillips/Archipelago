@@ -29,8 +29,42 @@
     <div id="user-content-wrapper" class="markdown">
         <div id="user-content" class="grass-island">
             <h1>User Content</h1>
-            Below is a list of all the content you have generated on this site. Rooms and seeds are listed separately.<br/>
+            Below is a list of all the content you have generated on this site. Rooms, seeds and lobbies are listed separately.<br/>
             Sessions can be saved or synced across devices using the <a href="{{url_for('show_session')}}">Sessions Page.</a>
+
+            <h2>Your Lobbies</h2>
+            {% if lobbies %}
+                <table id="lobbies-table" class="table">
+                    <thead>
+                        <tr>
+                            <th>Lobby</th>
+                            <th>Name</th>
+                            <th class="center">YAMLs</th>
+                            <th>Created (UTC)</th>
+                            <th>Last Activity (UTC)</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for lobby in lobbies %}
+                            <tr>
+                                <td><a href="{{ url_for("lobby_view", lobby=lobby.id) }}">{{ lobby.id|suuid }}</a></td>
+                                <td>{{ lobby.name or "YAML Lobby" }}</td>
+                                <td class="center">{{ lobby.yamls|length }}</td>
+                                <td>{{ lobby.creation_time.strftime("%Y-%m-%d %H:%M") }}</td>
+                                <td>{{ lobby.last_activity.strftime("%Y-%m-%d %H:%M") }}</td>
+                                <td>
+                                    <form action="{{ url_for("lobby_delete", lobby=lobby.id) }}" method="post" style="display:inline">
+                                        <button type="submit" class="linklike">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                You have not created any lobbies yet!
+            {% endif %}
 
             <h2>Your Rooms</h2>
             {% if rooms %}

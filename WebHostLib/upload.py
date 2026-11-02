@@ -214,7 +214,9 @@ def uploads():
 def user_content():
     rooms = select(room for room in Room if room.owner == session["_id"])
     seeds = select(seed for seed in Seed if seed.owner == session["_id"])
-    return render_template("userContent.html", rooms=rooms, seeds=seeds)
+    from .models import Lobby
+    lobbies = select(lobby for lobby in Lobby if lobby.owner == session["_id"])
+    return render_template("userContent.html", rooms=rooms, seeds=seeds, lobbies=lobbies)
 
 
 @app.route("/disown_seed/<suuid:seed>", methods=["GET"])
